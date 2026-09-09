@@ -60,6 +60,10 @@ template.innerHTML = `
         Support
     </button>
 
+    <button id="eptest" class="transferBtn">
+        EP TEST
+    </button>
+
 </div>
 `;
 
@@ -157,6 +161,17 @@ class myDesktopSDK extends HTMLElement {
             );
 
         });
+      this.shadowRoot
+        .getElementById("eptest")
+        .addEventListener("click", () => {
+
+            console.log("EP TEST clicked");
+
+            this.transferToEntryPoint(
+            "eb12b73c-fe53-49af-97f3-95f2fbd89246"
+        );
+
+    });
 
 }
 
@@ -171,7 +186,8 @@ class myDesktopSDK extends HTMLElement {
 
 
     // Transfer to DN ie Blind-Transfer
-  async transferToDN(phoneDN) {
+async transferToDN(phoneDN) {
+
     let interactionId = await this.getInteractionId();
 
     let response = await Desktop.agentContact.blindTransfer({
@@ -183,7 +199,56 @@ class myDesktopSDK extends HTMLElement {
         }
     });
 
-    logger.info("transferToDN" + JSON.stringify(response));
+    logger.info(
+        "transferToDN" +
+        JSON.stringify(response)
+    );
+}
+    async transferToEntryPoint(entryPointId) {
+
+    try {
+
+        let interactionId =
+            await this.getInteractionId();
+
+        console.log(
+            "Transfering to Entry Point:",
+            entryPointId
+        );
+
+        let response =
+            await Desktop.agentContact
+                .blindTransfer({
+
+                    interactionId,
+
+                    data: {
+                        destAgentId:
+                            entryPointId,
+
+                        mediaType:
+                            "telephony",
+
+                        destinationType:
+                            "entrypointDialNumber"
+                    }
+
+                });
+
+        console.log(
+            "Entry Point Response",
+            response
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Entry Point Transfer Failed",
+            error
+        );
+
+    }
 }
 
 }   // <-- THIS closes the class
